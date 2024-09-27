@@ -1,6 +1,5 @@
 use rand::{prelude::Distribution, rngs::StdRng, Rng, SeedableRng};
 use statrs::distribution::MultivariateNormal;
-use statrs::distribution::Uniform;
 
 pub struct State<const N_DIM: usize> {
     rng: StdRng,
@@ -41,9 +40,10 @@ impl<const N_DIM: usize> State<N_DIM> {
         let binding = self.proposal_distribution.sample(&mut self.rng);
         let proposal= binding.as_slice();
         let ll = log_likelihood::<N_DIM>(proposal) - log_likelihood::<N_DIM>(&self.arr);
-        let u = Uniform::new(0.0, 1.0).unwrap().sample(&mut self.rng);
+        // let u = Uniform::new(0.0, 1.0).unwrap().sample(&mut self.rng);
+        let u = (self.rng.gen_range(0.0..1.0) as f64).ln();
         if u < ll{
-            let mut new_loc = [0.0; N_DIM];
+            let mut new_loc: [f64; N_DIM] = [0.0; N_DIM];
             for i in 0..N_DIM{
                 new_loc[i] = proposal[i]
             }
